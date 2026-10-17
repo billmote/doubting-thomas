@@ -75,7 +75,9 @@ Hooks never ask Thomas anything. They only read state and say yes or no. Thomas 
 
 ## Install
 
-In Claude Code:
+**In Claude (Cowork / claude.ai):** download `dist/doubting-thomas.plugin` from this repo (https://github.com/billmote/doubting-thomas/raw/main/dist/doubting-thomas.plugin) and upload it as a plugin in your Claude settings. There is no `/plugin` command in Cowork sessions. Start a new session afterwards.
+
+**In Claude Code (terminal):**
 
 ```
 /plugin marketplace add https://github.com/billmote/doubting-thomas
