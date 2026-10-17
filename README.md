@@ -33,12 +33,45 @@ flowchart TD
 
 `/skeptic` spawns a fresh subagent that sees only the artifact, the charter and the corrections log. Not the build conversation.
 
+### Who talks to whom
+
+```mermaid
+sequenceDiagram
+    participant U as You
+    participant A as Claude (main agent)
+    participant H as Hooks
+    participant S as State files
+    participant T as Thomas (fresh subagent)
+    A->>H: first Edit/Write
+    H->>S: plan marker?
+    S-->>H: none
+    H-->>A: DENY, run /skeptic plan
+    A->>T: plan + charter + your corrections (nothing else)
+    T-->>A: PASS or FAIL + reasons
+    A->>S: record.sh plan (writes, reads back)
+    A->>H: Edit/Write again
+    H-->>A: allow
+    loop each successful edit
+        H->>S: edit counter + 1
+    end
+    A->>H: try to stop
+    H->>S: done marker covers current count?
+    S-->>H: no
+    H-->>A: BLOCK, run /skeptic done
+    A->>T: diff + real test output + charter + corrections
+    T-->>A: PASS or FAIL + reasons
+    A->>S: record.sh done (bound to edit count)
+    A->>U: short verdict
+```
+
+Hooks never ask Thomas anything. They only read state and say yes or no. Thomas never sees the build conversation.
+
 ## Install
 
 In Claude Code:
 
 ```
-/plugin marketplace add billmote/doubting-thomas
+/plugin marketplace add https://github.com/billmote/doubting-thomas
 /plugin install doubting-thomas@doubting-thomas
 ```
 
