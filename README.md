@@ -41,6 +41,7 @@ sequenceDiagram
     participant A as Claude (main agent)
     participant H as Hooks
     participant S as State files
+    participant W as Work subagent (builder, explorer)
     participant T as Thomas (fresh subagent)
     A->>H: first Edit/Write
     H->>S: plan marker?
@@ -54,6 +55,10 @@ sequenceDiagram
     loop each successful edit
         H->>S: edit counter + 1
     end
+    A->>W: delegate a task
+    W->>H: Edit/Write
+    H-->>W: allow (subagents skip the plan gate)
+    H->>S: edit counter + 1 (still counted)
     A->>H: try to stop
     H->>S: done marker covers current count?
     S-->>H: no
@@ -63,6 +68,8 @@ sequenceDiagram
     A->>S: record.sh done (bound to edit count)
     A->>U: short verdict
 ```
+
+Work subagents are never blocked by the plan gate, but their edits still raise the counter, so the done gate still demands a review of everything they changed. (Hook code does not filter them out of the count; that they share the parent's session id is not verified live.)
 
 Hooks never ask Thomas anything. They only read state and say yes or no. Thomas never sees the build conversation.
 
