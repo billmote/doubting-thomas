@@ -47,10 +47,10 @@ Restart the session. No plugin support? Use `bash scripts/install.sh` (merges ho
 ## Requirements
 
 - Claude Code with hooks and plugins.
-- `bash`, `awk`, `cksum`, `date`, `mkdir`, `mv`, `cut`, `tr`, `find`. Stock macOS (bash 3.2) and Linux are fine. No `jq`, `python3` or `git` needed by the hooks.
+- `bash` plus standard Unix tools (`awk`, `sed`, `grep`, `cksum`, `date`, `find`, `cut`, `tr`, `head`, `cp`, `mv`, `mkdir`). Stock macOS (bash 3.2) and Linux are fine. No `jq`, `python3` or `git` needed by the hooks.
 - Windows: use WSL or Git Bash.
 - The reviewer model. `/skeptic` tries `fable`, then `opus`, then your default. Any model works, a stronger one reviews better.
-- Python 3 only for `scripts/install.sh` (the settings merge).
+- Python 3 only for `scripts/install.sh` and `scripts/uninstall.sh` (the settings merge).
 
 ## Make it yours
 
@@ -62,6 +62,8 @@ Your corrections go in `~/.claude/skeptic/corrections.md` (create it). Newest fi
 - `--defer` records NO review. The marker is an honesty checkpoint, not a security control; the agent could call the helper directly.
 - Every hook fails open. An unwritable state dir or missing session id lets the action through, so a bug never bricks a session.
 - Subagents are never gated.
+- Edits to Claude's own plan files (`*/.claude/plans/*`) are neither gated nor counted.
+- Thomas's session context is capped (about 12 KB across charter and your corrections), so keep `corrections.md` short.
 
 ## Test
 
