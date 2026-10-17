@@ -55,6 +55,12 @@ sequenceDiagram
     loop each successful edit
         H->>S: edit counter + 1
     end
+    opt same error twice
+        H-->>A: one note: step back, run /skeptic plan
+        A->>T: NEW plan + charter + your corrections
+        T-->>A: PASS or FAIL + reasons
+        A->>S: record.sh plan
+    end
     A->>W: delegate a task
     W->>H: Edit/Write
     H-->>W: allow (subagents skip the plan gate)
@@ -70,6 +76,8 @@ sequenceDiagram
 ```
 
 Work subagents are never blocked by the plan gate, but their edits still raise the counter, so the done gate still demands a review of everything they changed. (Hook code does not filter them out of the count; that they share the parent's session id is not verified live.)
+
+Thomas is asked three times: at the first plan, when the same error repeats, and before done. Each time it is Claude running `/skeptic`, never a hook.
 
 Hooks never ask Thomas anything. They only read state and say yes or no. Thomas never sees the build conversation.
 
