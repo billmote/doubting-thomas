@@ -1,6 +1,6 @@
 # Doubting Thomas
 
-A fresh-context skeptic for Claude Code. Thomas reviews your work and gives a verdict (PASS or FAIL plus reasons). He never edits anything. Hooks make sure he is asked.
+A fresh-context skeptic for Claude Code. Thomas reviews at three moments: before a plan, when the same error repeats, and before done. He gives a verdict (PASS or FAIL plus reasons) and never edits anything. Hooks make sure he is asked.
 
 ## The work loop
 
