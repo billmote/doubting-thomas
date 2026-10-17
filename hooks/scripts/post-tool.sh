@@ -32,7 +32,7 @@ case "$event" in
     { if [ -e "$file" ]; then grep -v "^$sum " "$file" 2>/dev/null || true; fi; printf '%s %s\n' "$sum" "$count"; } > "$file.tmp.$$"
     mv -f "$file.tmp.$$" "$file"
     if [ "$count" -eq 2 ]; then
-      note="The same error has now occurred twice this session. Thomas's second checkpoint applies: step back and ask whether the work is digging in the wrong place before trying again. A fresh review is available with /skeptic plan."
+      note="The same error has now occurred twice this session. Thomas's second checkpoint applies: step back and ask whether the work is digging in the wrong place. Before trying again, run /skeptic plan with a NEW plan so a fresh Thomas reviews the approach."
       printf '{"hookSpecificOutput":{"hookEventName":"PostToolUseFailure","additionalContext":"%s"}}\n' "$(sk_esc "$note")"
     fi
     ;;

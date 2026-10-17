@@ -16,7 +16,7 @@ flowchart TD
     C -->|plan PASS on file| H
     H --> I[Work: each successful edit bumps the edit counter]
     I --> J{Same error twice?}
-    J -->|yes| K[One-time step-back note] --> I
+    J -->|yes| K[One-time note: step back, re-plan] --> K2["/skeptic plan"] --> K3[Fresh Thomas reviews the new approach] --> I
     J -->|no| L{Try to stop}
     L -->|edits since last done PASS| M[Done gate BLOCKS the stop]
     M --> N["/skeptic done"]
@@ -28,7 +28,7 @@ flowchart TD
 ```
 
 1. **Plan gate.** The first file edit of a session is blocked until `/skeptic plan` records a PASS.
-2. **Same-error nudge.** The second time the same error appears, you get one "step back, are we digging in the wrong place?" note. Never blocks.
+2. **Same-error checkpoint.** The second time the same error appears, Claude gets one note telling it to step back and run `/skeptic plan` with a new plan, so Thomas reviews the approach again. The hook only nudges; the review itself is Claude running the command. Never blocks.
 3. **Done gate.** A session that edited files cannot stop until `/skeptic done` records a PASS for the current edit count. Edit again after a PASS and it needs a new one.
 
 `/skeptic` spawns a fresh subagent that sees only the artifact, the charter and the corrections log. Not the build conversation.
