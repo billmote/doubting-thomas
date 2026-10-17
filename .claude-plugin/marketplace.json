@@ -1,0 +1,11 @@
+{
+  "name": "doubting-thomas",
+  "owner": { "name": "Bill Mote" },
+  "plugins": [
+    {
+      "name": "doubting-thomas",
+      "source": "./",
+      "description": "A fresh-context skeptic that reviews your plan and your finished work, enforced by hooks."
+    }
+  ]
+}

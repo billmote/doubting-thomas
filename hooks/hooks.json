@@ -1,0 +1,9 @@
+{
+  "hooks": {
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session-start.sh", "timeout": 15 }] }],
+    "PreToolUse": [{ "matcher": "Edit|Write|NotebookEdit|MultiEdit", "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/plan-gate.sh", "timeout": 15 }] }],
+    "PostToolUse": [{ "matcher": "Edit|Write|NotebookEdit|MultiEdit", "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/post-tool.sh", "timeout": 15 }] }],
+    "PostToolUseFailure": [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/post-tool.sh", "timeout": 15 }] }],
+    "Stop": [{ "hooks": [{ "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/done-gate.sh", "timeout": 15 }] }]
+  }
+}
