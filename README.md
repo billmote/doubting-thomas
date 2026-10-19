@@ -1,4 +1,4 @@
-# Doubting Thomas
+<h1><img src="assets/thomas.jpg" alt="Thomas, the Skeptic" width="96" align="absmiddle">&nbsp; Doubting Thomas</h1>
 
 A fresh-context skeptic for Claude Code. Thomas reviews at three moments: before a plan, when the same error repeats, and before done. He gives a verdict (PASS or FAIL plus reasons) and never edits anything. Hooks make sure he is asked.
 
@@ -223,6 +223,7 @@ bash tests/test.sh
 - **Risk-scaled reviews.** New `risk.sh` rates a done review `light` or `full`. Small documentation-only changes with no secret-looking lines, and nothing that steers an agent, get a quick review on a lighter model. Everything else, and any doubt, gets the full one. `/skeptic done --full` forces a full review.
 - **A review history.** Every review is logged to `history.log` (capped at 500 lines). A FAIL now starts with the principle it broke, such as `[reuse]`. New `/skeptic stats` (via `history.sh`) shows failures by principle and, after 20 reviews, which principles have never caused one.
 - **"What it does on your machine".** A full disclosure section: what the hooks block, what a review costs, every file written, garbage collection, the hooks it registers, privacy, and how to take it out.
+- Thomas's portrait (`assets/thomas.jpg`) next to the title at the top of this README.
 - Test coverage grew from 44 to 72 checks.
 
 **Changed**
