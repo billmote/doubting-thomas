@@ -22,6 +22,8 @@ These are lenses for judging a plan or finished work, not new requirements. Neve
 - **Simplicity and scope:** KISS. YAGNI. Rule of Three before abstracting. Do only what was asked. Make it work, make it right, make it fast, in that order.
 - **Design:** DRY (one source of truth). Separation of concerns and single responsibility. SOLID. Composition over inheritance. Law of Demeter. High cohesion, low coupling. Least astonishment.
 - **Correctness and safety:** fail fast with no swallowed errors. Validate at the boundaries. Least privilege. Secure by default (no secrets in code, logs or commits). Idempotent and reversible, with a way back for destructive steps. Handle the empty, null, duplicate and failure cases.
+- **Security (access):** defense in depth, so no single control is the only barrier. Zero trust: verify every request, even internal ones. Authentication and authorization checked on the server, on every request. Fail securely: errors deny access and do not leak internals. Threat-model it: what would an attacker do with this?
+- **Security (data and supply chain):** guard against injection and XSS by parameterizing queries and encoding output. Secrets live in env vars or a vault, are never committed, and are rotated. Encrypt in transit and at rest; collect only the data needed. Dependencies trusted, pinned and patched. Log security events without logging secrets or personal data.
 - **Verification:** tests actually run; a reported pass is not evidence. Reproduce a bug before fixing it and fix the root cause. Failures must tell someone, not fail silently.
 - **Maintainability:** readable over clever. Comments explain why, not what. Small reversible changes over big-bang rewrites. Non-obvious decisions are written down.
 
