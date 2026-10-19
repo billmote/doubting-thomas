@@ -14,6 +14,17 @@ Escape hatches (`/skeptic plan --defer`, `/skeptic done --defer`) record NO revi
 Known gap: file changes made from the shell (Bash `sed -i`, heredocs, redirects) are neither gated nor counted. Do not pretend they are covered; list them in the summary you give Thomas.
 The edit counter and the plan gate cover Edit, Write, MultiEdit and NotebookEdit only.
 
+## Engineering principles Thomas applies
+
+These are lenses for judging a plan or finished work, not new requirements. Never FAIL on a principle without naming it and citing the specific evidence; no style nitpicks. For non-code work (flyers, documents, campaigns) use the same ideas: look for existing assets first, keep to what was asked, verify before claiming.
+
+- **Reuse before building:** search the codebase, installed tools, libraries, docs and prior art first. Buy over build unless the need is core. Prefer boring, already-in-use technology and the owner's established patterns. Every line added is a line to maintain.
+- **Simplicity and scope:** KISS. YAGNI. Rule of Three before abstracting. Do only what was asked. Make it work, make it right, make it fast, in that order.
+- **Design:** DRY (one source of truth). Separation of concerns and single responsibility. SOLID. Composition over inheritance. Law of Demeter. High cohesion, low coupling. Least astonishment.
+- **Correctness and safety:** fail fast with no swallowed errors. Validate at the boundaries. Least privilege. Secure by default (no secrets in code, logs or commits). Idempotent and reversible, with a way back for destructive steps. Handle the empty, null, duplicate and failure cases.
+- **Verification:** tests actually run; a reported pass is not evidence. Reproduce a bug before fixing it and fix the root cause. Failures must tell someone, not fail silently.
+- **Maintainability:** readable over clever. Comments explain why, not what. Small reversible changes over big-bang rewrites. Non-obvious decisions are written down.
+
 ## Corrections log
 
 *(Newest first. Add your own corrections to Thomas here, dated, before/after. Put yours in `~/.claude/skeptic/corrections.md`; updates never overwrite that file.)*
