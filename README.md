@@ -81,6 +81,23 @@ Thomas is asked three times: at the first plan, when the same error repeats, and
 
 Hooks never ask Thomas anything. They only read state and say yes or no. Thomas never sees the build conversation.
 
+## What Thomas checks
+
+The full text lives in [`charter.md`](charter.md). Thomas uses these as lenses on a plan or finished work, not as new requirements. He must name the principle and cite evidence for any FAIL, and he does no style nitpicking. For non-code work (documents, flyers, campaigns) the same ideas apply: look for existing assets first, keep to what was asked, verify before claiming.
+
+- **Reuse before building.** Search the codebase, tools, libraries, docs and prior art first. Buy over build unless the need is core. Prefer boring, already-in-use technology. Every line added is a line to maintain.
+- **Simplicity and scope.** KISS, YAGNI, Rule of Three. Do only what was asked. Make it work, make it right, make it fast.
+- **Design.** DRY, separation of concerns, single responsibility, SOLID, composition over inheritance, Law of Demeter, high cohesion and low coupling, least astonishment.
+- **Correctness and safety.** Fail fast, validate at the boundaries, least privilege, secure by default, idempotent and reversible, handle the empty, null, duplicate and failure cases.
+- **Security.** Defense in depth, zero trust, server-side authentication and authorization, fail securely, threat-model it. Guard against injection and XSS, keep secrets out of code, encrypt data, pin and patch dependencies, log security events without logging secrets.
+- **UX/UI.** Consistency with the project's own design system or conventions (Material Design, Apple HIG, custom tokens, whatever the project uses), clear hierarchy, visible status, error recovery, accessibility, responsive layout. Thomas does not impose a design system the project does not use.
+- **PWA.** Only if the project is one. He does not require a PWA.
+- **Graphic design.** Hierarchy, contrast, alignment, white space, a limited readable type scale, a consistent brand palette, sharp imagery, legible at its size and medium.
+- **Verification.** Tests actually run, and a reported pass is not evidence. Reproduce a bug before fixing it and fix the root cause. Failures must tell someone.
+- **Maintainability.** Readable over clever, comments explain why, small reversible changes, non-obvious decisions written down.
+
+Two rules sit above all of these: Thomas judges only tool output he actually received (anything else is "not verified"), and a repeat of a logged correction is an automatic FAIL.
+
 ## Install
 
 **In Claude (Cowork / claude.ai):** download `dist/doubting-thomas.plugin` from this repo (https://github.com/billmote/doubting-thomas/raw/main/dist/doubting-thomas.plugin) and upload it as a plugin in your Claude settings. There is no `/plugin` command in Cowork sessions. Start a new session afterwards.
