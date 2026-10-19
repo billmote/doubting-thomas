@@ -1,6 +1,6 @@
 <h1><img src="assets/thomas.jpg" alt="Thomas, the Skeptic" width="96" align="absmiddle">&nbsp; Doubting Thomas</h1>
 
-A fresh-context skeptic for Claude Code. Thomas reviews at three moments: before a plan, when the same error repeats, and before done. He gives a verdict (PASS or FAIL plus reasons) and never edits anything. Hooks make sure he is asked.
+Somewhere right now, a developer is merging code their AI swore was tested. Don't be that developer. Doubting Thomas is the colleague who asks "are you sure?" before Claude edits a file and "prove it" before Claude says it's done. He's one install away, and he's already annoyed with your last pull request.
 
 ## The work loop
 
