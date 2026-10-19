@@ -109,5 +109,76 @@ out=$(printf '{}' | SKEPTIC_HOME=/proc/nope "$BIN/session-start.sh"); rc=$?
 printf '# C\r\nline\r\n' > "$SKEPTIC_HOME/charter.md"
 out=$(printf '{}' | "$BIN/session-start.sh"); has '\r' "$out" && bad "CR leaked" "$out" || ok "CR in charter stripped (valid JSON)"
 
+echo "== corrections log (auto-log)"
+CH=$(mktemp -d); CF="$CH/corrections.md"
+SKEPTIC_HOME="$CH" "$BIN/log-correction.sh" "added an unasked step" "do only what was asked"
+has "After: do only what was asked" "$(cat "$CF" 2>/dev/null)" && ok "log-correction writes a dated before/after line" || bad "log-correction write" "$(cat "$CF" 2>&1)"
+SKEPTIC_HOME="$CH" "$BIN/log-correction.sh" "second thing" "second fix"
+case "$(head -1 "$CF")" in *"second fix"*) ok "newest correction goes on top" ;; *) bad "newest first" "$(head -1 "$CF")" ;; esac
+SKEPTIC_HOME="$CH" "$BIN/log-correction.sh" "second thing again" "second fix"
+[ "$(wc -l < "$CF" | tr -d ' ')" = 2 ] && ok "an exact repeat is not logged twice" || bad "dedupe" "$(cat "$CF")"
+i=0; while [ $i -lt 60 ]; do i=$((i+1)); SKEPTIC_HOME="$CH" "$BIN/log-correction.sh" "before number $i padded padded padded padded padded padded padded padded padded" "after number $i padded padded padded padded padded padded padded padded padded"; done
+sz=$(wc -c < "$CF" | tr -d ' ')
+[ "$sz" -le 5000 ] && [ -s "$CH/corrections-archive.md" ] && ok "log stays under 5 KB; older lines move to the archive ($sz bytes)" || bad "cap" "size=$sz"
+SKEPTIC_HOME="$CH" "$BIN/log-correction.sh" "only one arg" >/dev/null 2>&1; rc=$?
+[ $rc -eq 2 ] && ok "missing argument is refused (usage, exit 2)" || bad "usage" "rc=$rc"
+SKEPTIC_HOME=/proc/nope/x "$BIN/log-correction.sh" a b >/dev/null 2>&1; rc=$?
+[ $rc -eq 0 ] && ok "unwritable log fails open (exit 0)" || bad "log failopen" "rc=$rc"
+rm -rf "$CH"
+
+echo "== prompt-submit (correction note)"
+up() { printf '{"session_id":"s","hook_event_name":"UserPromptSubmit","prompt":"%s"}' "$1"; }
+out=$(run prompt-submit.sh "$(up 'I told you not to add things')")
+has additionalContext "$out" && has log-correction.sh "$out" && ok "a correction phrase injects the logging note" || bad "note" "$out"
+out=$(run prompt-submit.sh '{"session_id":"s","prompt":"that'"'"'s not what I asked"}')
+has additionalContext "$out" && ok "'that's not what I asked' is caught" || bad "thats not" "$out"
+out=$(run prompt-submit.sh "$(up 'please run the tests again')"); [ -z "$out" ] && ok "an ordinary request injects nothing" || bad "plain" "$out"
+out=$(run prompt-submit.sh '{"session_id":"s","tool_input":{"prompt":"I told you"}}'); [ -z "$out" ] && ok "a nested prompt key is ignored" || bad "nested prompt" "$out"
+out=$(run prompt-submit.sh '{"session_id":"s"}'); [ -z "$out" ] && ok "no prompt: no note" || bad "no prompt" "$out"
+
+echo "== risk (review depth)"
+if command -v git >/dev/null 2>&1; then
+  mk() { d=$(mktemp -d); ( cd "$d" && git init -q . && echo base > README.md && git add README.md && git -c user.email=t@t -c user.name=t commit -q -m base ) >/dev/null 2>&1; printf '%s' "$d"; }
+  d=$(mk); echo "a small edit" >> "$d/README.md"
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = light ] && ok "small doc edit is light" || bad "light" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mk); echo "print(1)" > "$d/app.py"
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "a code file is full" || bad "code" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mk); echo "rule" > "$d/charter.md"
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "a charter file is full even though it is markdown" || bad "charter" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mk); mkdir "$d/commands"; echo "x" > "$d/commands/run.md"
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "a commands file is full" || bad "commands" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mk); i=0; while [ $i -lt 60 ]; do i=$((i+1)); echo "line $i" >> "$d/README.md"; done
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "a large doc change is full" || bad "large" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mk); echo "api_key = abc123" >> "$d/README.md"
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "a secret-looking line is full" || bad "secret" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mk)
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "no changes found is full" || bad "nochange" "$("$BIN/risk.sh" "$d" 2>&1)"
+  d=$(mktemp -d)
+  [ "$("$BIN/risk.sh" "$d" 2>/dev/null)" = full ] && ok "not a git folder is full" || bad "nogit" "$("$BIN/risk.sh" "$d" 2>&1)"
+else
+  ok "risk tests skipped: git not installed"
+fi
+
+echo "== review history"
+HH=$(mktemp -d)
+out=$(SKEPTIC_HOME="$HH" "$BIN/history.sh" stats); has "No reviews" "$out" && ok "stats with no history says so" || bad "empty stats" "$out"
+CLAUDE_CODE_SESSION_ID=hs SKEPTIC_HOME="$HH" "$BIN/history.sh" fail done security "leaked a token" 2>/dev/null
+has "|done|fail|security|leaked a token" "$(cat "$HH/history.log" 2>&1)" && ok "a FAIL is recorded with its principle" || bad "fail line" "$(cat "$HH/history.log" 2>&1)"
+CLAUDE_CODE_SESSION_ID=hs SKEPTIC_HOME="$HH" "$BIN/history.sh" fail plan "[Nonsense]" "odd" 2>/dev/null
+has "|plan|fail|other|odd" "$(cat "$HH/history.log")" && ok "an unknown principle is filed as other" || bad "other tag" "$(cat "$HH/history.log")"
+CLAUDE_CODE_SESSION_ID=hs SKEPTIC_HOME="$HH" "$BIN/record.sh" done "fine" </dev/null >/dev/null 2>&1
+has "|done|pass|-|fine" "$(cat "$HH/history.log")" && ok "record.sh PASS adds a history line" || bad "pass line" "$(cat "$HH/history.log")"
+out=$(SKEPTIC_HOME="$HH" "$BIN/history.sh" stats)
+has "Failures by principle" "$out" && has "security: 1" "$out" && has "Too few reviews" "$out" && ok "stats shows failures by principle and refuses to judge on few reviews" || bad "stats" "$out"
+i=0; while [ $i -lt 20 ]; do i=$((i+1)); printf '2026-01-01T00:00:00-0500|x|done|pass|-|n\n' >> "$HH/history.log"; done
+out=$(SKEPTIC_HOME="$HH" "$BIN/history.sh" stats)
+has "never caused a failure:" "$out" && has "reuse" "$out" && ok "with 20+ reviews stats names principles that never failed anything" || bad "never failed" "$out"
+case "$out" in *"never caused a failure: "*security*) bad "security listed as never" "$out" ;; *) ok "a principle that did fail is not listed as unused" ;; esac
+( . "$BIN/lib.sh"; SK_HOME="$HH"; sid=x; i=0; while [ $i -lt 520 ]; do i=$((i+1)); sk_history done pass - n; done )
+[ "$(wc -l < "$HH/history.log" | tr -d ' ')" -le 500 ] && ok "history is capped at 500 lines" || bad "history cap" "$(wc -l < "$HH/history.log")"
+SKEPTIC_HOME=/proc/nope/x "$BIN/history.sh" fail done other x >/dev/null 2>&1; rc=$?
+[ $rc -eq 0 ] && ok "history write fails open" || bad "history failopen" "rc=$rc"
+rm -rf "$HH"
+
 rm -rf "$SKEPTIC_HOME"
 echo; echo "passed $pass, failed $fail"; [ "$fail" -eq 0 ]

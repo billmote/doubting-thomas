@@ -122,6 +122,21 @@ sk_edits() {
 
 sk_now() { date '+%Y-%m-%dT%H:%M:%S%z'; }
 
+# sk_history WHICH VERDICT TAG NOTE - append one line to the review history, capped at 500 lines.
+# Fields: when|session|plan-or-done|pass/fail/deferred|principle|note. Always returns 0 (fail open).
+sk_history() {
+  h="$SK_HOME/history.log"
+  mkdir -p "$SK_HOME" 2>/dev/null || return 0
+  hn=$(printf '%s' "${4:-}" | tr '\n\r\t|' '    ' | cut -c1-200)
+  printf '%s|%s|%s|%s|%s|%s\n' "$(sk_now)" "${sid:-?}" "$1" "$2" "$3" "$hn" >> "$h" 2>/dev/null || return 0
+  hc=$(wc -l < "$h" 2>/dev/null | tr -d ' ') || return 0
+  case "$hc" in ''|*[!0-9]*) return 0 ;; esac
+  if [ "$hc" -gt 500 ]; then
+    tail -n 400 "$h" > "$h.tmp.$$" 2>/dev/null && mv -f "$h.tmp.$$" "$h" 2>/dev/null
+  fi
+  return 0
+}
+
 # sk_esc TEXT - make TEXT safe inside a JSON string.
 sk_esc() { printf '%s' "$1" | tr '\n\r\t' '   ' | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
 

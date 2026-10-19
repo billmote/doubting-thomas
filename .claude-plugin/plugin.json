@@ -1,7 +1,7 @@
 {
   "name": "doubting-thomas",
-  "version": "1.0.0",
-  "description": "Doubting Thomas: a fresh-context skeptic for Claude Code. Plan gate, done gate bound to an edit counter, same-error nudge, and the /skeptic command.",
+  "version": "1.1.0",
+  "description": "Doubting Thomas: a fresh-context skeptic for Claude Code. Plan gate, done gate bound to an edit counter, same-error nudge, self-filling corrections log, risk-scaled review depth, review history, and the /skeptic command.",
   "author": { "name": "Bill Mote" },
   "homepage": "https://github.com/billmote/doubting-thomas",
   "license": "MIT"

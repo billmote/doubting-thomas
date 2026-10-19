@@ -25,8 +25,10 @@ echo "skeptic: recorded $which ($kind) for session $sid at edit count $edits -> 
 if [ "$kind" = "pass" ]; then
   r="T-$(date +%s)-$(printf '%s' "$sid|$which|$edits|$ts" | cksum | cut -d' ' -f1)"
   printf '%s %s %s %s\n' "$r" "$(date +%s)" "$sid" "$which" >> "$SK_HOME/ledger" 2>/dev/null || echo "skeptic: warning - ledger not writable; receipt will not verify" >&2
+  sk_history "$which" pass - "$note"
   printf '%s\n' "$r"
 else
+  sk_history "$which" deferred - "$note"
   echo "skeptic: DEFERRED - no review was done and none is recorded" >&2
 fi
 exit 0

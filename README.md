@@ -79,7 +79,7 @@ Work subagents are never blocked by the plan gate, but their edits still raise t
 
 Thomas is asked three times: at the first plan, when the same error repeats, and before done. Each time it is Claude running `/skeptic`, never a hook.
 
-Hooks never ask Thomas anything. They only read state and say yes or no. Thomas never sees the build conversation.
+Hooks never ask Thomas anything. They only read state and say yes or no, apart from two one-line notes to Claude: the same-error step-back and the correction-logging prompt. Thomas never sees the build conversation.
 
 ## What Thomas checks
 
@@ -114,18 +114,26 @@ Restart the session. No plugin support? Use `bash scripts/install.sh` (merges ho
 ## Requirements
 
 - Claude Code with hooks and plugins.
-- `bash` plus standard Unix tools (`awk`, `sed`, `grep`, `cksum`, `date`, `find`, `cut`, `tr`, `head`, `cp`, `mv`, `mkdir`). Stock macOS (bash 3.2) and Linux are fine. No `jq`, `python3` or `git` needed by the hooks.
+- `bash` plus standard Unix tools (`awk`, `sed`, `grep`, `cksum`, `date`, `find`, `cut`, `tr`, `head`, `tail`, `wc`, `cp`, `mv`, `mkdir`). Stock macOS (bash 3.2) and Linux are fine. No `jq`, `python3` or `git` needed by the hooks. `git` is used only by `risk.sh` to pick the review depth.
 - Windows: use WSL or Git Bash.
 - The reviewer model. `/skeptic` tries `fable`, then `opus`, then your default. Any model works, a stronger one reviews better.
 - Python 3 only for `scripts/install.sh` and `scripts/uninstall.sh` (the settings merge).
 
 ## Make it yours
 
-Your corrections go in `~/.claude/skeptic/corrections.md` (create it). Newest first, dated, before and after. Thomas is given it every session and at every review, and updates never overwrite it. A repeat of a logged correction is an automatic FAIL.
+Your corrections go in `~/.claude/skeptic/corrections.md`. Newest first, dated, before and after. Thomas is given it every session and at every review, and updates never overwrite it. A repeat of a logged correction is an automatic FAIL.
+
+**It fills itself.** When a message of yours sounds like a correction ("I told you...", "that's not what I asked", "stop adding..."), a hook asks Claude to log it silently with `log-correction.sh`. The match is deliberately narrow, so Claude is told to log nothing if the message is only a task. The file stays under about 5 KB; older lines move to `corrections-archive.md`, never deleted. You can still edit the file by hand.
+
+**Review depth.** `/skeptic done` runs `risk.sh` first. A small documentation-only change (40 changed lines or fewer, no secret-looking lines, nothing that steers an agent such as the charter, corrections, skills, prompts, commands or hooks) gets a quick review on a lighter model. Anything else, or any doubt, gets the full review. `--full` forces it. The review is never skipped, only scaled. A plan review is always full. Without git, every review is full.
+
+**What actually catches things.** Every review is logged in `~/.claude/skeptic/history.log` (last 500). A FAIL starts with the principle it broke, such as `[reuse]`. `/skeptic stats` shows failures by principle and, after 20 reviews, which principles have never caused one, so you can trim the charter. It only reports; it never edits the charter.
 
 ## Honest limits
 
 - Edits made from the shell (`sed -i`, heredocs, redirects) are not gated or counted. Only Edit, Write, MultiEdit and NotebookEdit.
+- Auto-logging corrections is a phrase match, so it misses corrections worded differently (log those by hand) and can fire on a message that is not one. Claude is told to log nothing in that case, but it is Claude's judgment, so skim `corrections.md` now and then.
+- `risk.sh` judges only uncommitted changes. If you commit code mid-session and then tweak a README, that last change is rated light. Use `--full` when in doubt.
 - `--defer` records NO review. The marker is an honesty checkpoint, not a security control; the agent could call the helper directly.
 - Every hook fails open. An unwritable state dir or missing session id lets the action through, so a bug never bricks a session.
 - Subagents are never gated.

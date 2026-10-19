@@ -21,6 +21,7 @@ s = json.load(open(path))
 h = s.setdefault("hooks", {})
 want = [
  ("SessionStart", "", "session-start.sh"),
+ ("UserPromptSubmit", "", "prompt-submit.sh"),
  ("PreToolUse", "Edit|Write|NotebookEdit|MultiEdit", "plan-gate.sh"),
  ("PostToolUse", "Edit|Write|NotebookEdit|MultiEdit", "post-tool.sh"),
  ("PostToolUseFailure", "", "post-tool.sh"),
